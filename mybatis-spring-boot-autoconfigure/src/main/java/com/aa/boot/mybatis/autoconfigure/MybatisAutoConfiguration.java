@@ -24,6 +24,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
+import org.springframework.beans.factory.support.SimpleBeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -63,7 +64,6 @@ import java.util.Set;
 @org.springframework.context.annotation.Configuration
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
 @EnableConfigurationProperties({MybatisesProperties.class})
-//@AutoConfigureBefore(MapperConfiguration.class)
 public class MybatisAutoConfiguration implements InitializingBean, BeanPostProcessor,ApplicationContextAware  {
 
     private static final Logger logger = LoggerFactory.getLogger(MybatisAutoConfiguration.class);
@@ -109,24 +109,23 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
 
     private void mapper() {
 
-//                    pes.getConfigs().forEach((k,v)->{
-//        ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
-//        if (this.resourceLoader != null) {
-//            scanner.setResourceLoader(this.resourceLoader);
-//        }
-//        scanner.setAnnotationClass(Mapper.class);
-//        scanner.registerFilters();
-//        scanner.setSqlSessionFactoryBeanName(k + "SqlSessionFactory");
-//        scanner.setSqlSessionTemplateBeanName(k + "SqlSessionTemplate");
-//        scanner.doScan(v.getMapperScanPackage());
-//            });
+        pes.getConfigs().forEach((k,v)->{
+        ClassPathMapperScanner scanner = new ClassPathMapperScanner(AutoConfiguredMapperScannerRegistrar.sThreadLocal.get());
+        if (this.resourceLoader != null) {
+            scanner.setResourceLoader(this.resourceLoader);
+        }
+        scanner.setAnnotationClass(Mapper.class);
+        scanner.registerFilters();
+        scanner.setSqlSessionFactoryBeanName(k + "SqlSessionFactory");
+        scanner.setSqlSessionTemplateBeanName(k + "SqlSessionTemplate");
+        scanner.doScan(v.getMapperScanPackage());
+            });
     }
 
     private void checkConfigFileExists() {
         logger.info("start mine");
     }
 
-//    // todo datasource
 
 
     public void datasource() {
@@ -146,13 +145,6 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
         return configurableListableBeanFactory.getBean(beanName, clazz);
     }
 
-//    @Override
-//    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-//        this.configurableApplicationContext = (ConfigurableApplicationContext) applicationContext;
-//    }
-
-
-    // todo sqlsessionfactory
 
     public void sqlSessionFactory() throws Exception {
         Map<String, MybatisProperties> mybatis = pes.getConfigs();
@@ -211,8 +203,7 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
         }
         factory.setConfiguration(configuration);
     }
-//
-//    // todo sqltemplete
+
 
     public void sqlSessionTemplate() {
         pes.getConfigs().forEach((k, v) -> {
@@ -231,7 +222,7 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        System.out.println(beanName);
+        logger.info("Searching for mappers annotated with @Mapper register " + beanName);
         return bean;
     }
 
@@ -258,10 +249,10 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
      * repositories.
      */
 
-    @ConditionalOnProperty("")
+
     public static class AutoConfiguredMapperScannerRegistrar
             implements BeanFactoryAware, ImportBeanDefinitionRegistrar, ResourceLoaderAware {
-
+        static final ThreadLocal<BeanDefinitionRegistry> sThreadLocal = new ThreadLocal();
         private BeanFactory beanFactory;
 
         private ResourceLoader resourceLoader;
@@ -278,24 +269,7 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
             }
 
             logger.info("Searching for mappers annotated with @Mapper");
-            System.out.println(pes);
-            List<String> packages = AutoConfigurationPackages.get(this.beanFactory);
-            if (logger.isDebugEnabled()) {
-                packages.forEach(pkg -> logger.debug("Using auto-configuration base package '{}'", pkg));
-            }
-            String[] beanDefinitionNames = registry.getBeanDefinitionNames();
-            Object o = System.getProperties().get("mine.configs");
-//            MybatisesProperties bean = beanFactory.getBean(MybatisesProperties.class);
-//            bean.getConfigs().forEach((k, v) -> {
-                ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
-                if (this.resourceLoader != null) {
-                    scanner.setResourceLoader(this.resourceLoader);
-                }
-                scanner.setAnnotationClass(Mapper.class);
-                scanner.registerFilters();
-                scanner.setSqlSessionFactoryBeanName("aaa" + "SqlSessionFactory");
-                scanner.doScan(StringUtils.toStringArray(packages));
-//            });
+            sThreadLocal.set(registry);
 
         }
 
