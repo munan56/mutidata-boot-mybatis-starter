@@ -114,10 +114,8 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
         if (this.resourceLoader != null) {
             scanner.setResourceLoader(this.resourceLoader);
         }
-        scanner.setAnnotationClass(Mapper.class);
         scanner.registerFilters();
         scanner.setSqlSessionFactoryBeanName(k + "SqlSessionFactory");
-        scanner.setSqlSessionTemplateBeanName(k + "SqlSessionTemplate");
         scanner.doScan(v.getMapperScanPackage());
             });
     }
@@ -222,7 +220,9 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        logger.info("Searching for mappers annotated with @Mapper register " + beanName);
+        if (bean instanceof MapperFactoryBean){
+            logger.info("Searching for mappers annotated with @Mapper register " + beanName);
+        }
         return bean;
     }
 
