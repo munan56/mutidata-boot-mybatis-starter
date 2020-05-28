@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="cb8a018c-72a0-41b5-b98e-4549974ed468" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="userSettingsFile" value="D:\develop\maven\apache-maven-3.6.2\conf\settings.xml" />
+      </MavenGeneralSettings>
+    </option>
+    <option name="importingSettings">
+      <MavenImportingSettings>
+        <option name="importAutomatically" value="true" />
+      </MavenImportingSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1cFURIyTSsGTQMssnLvByfG6O5e" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="Errors" />
+    <property name="settings.editor.splitter.proportion" value="0.32339954" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.munan.boot.mybatis.autoconfigure" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\code\demo\data\data-parent\mybatis-spring-boot-autoconfigure\src\main\resources" />
+    </key>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="cb8a018c-72a0-41b5-b98e-4549974ed468" name="Default Changelist" comment="" />
+      <created>1590123825825</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1590123825825</updated>
+      <workItem from="1590123828333" duration="1916000" />
+      <workItem from="1590227808345" duration="255000" />
+      <workItem from="1590228072737" duration="346000" />
+      <workItem from="1590228442002" duration="24217000" />
+      <workItem from="1590368083684" duration="3539000" />
+      <workItem from="1590374361941" duration="10140000" />
+      <workItem from="1590474039097" duration="29647000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="367" y="77" key="#Project_Structure" timestamp="1590228960023">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state x="367" y="77" key="#Project_Structure/0.0.1549.831@0.0.1549.831" timestamp="1590228960023" />
+    <state x="580" y="128" key="#com.intellij.ide.util.MemberChooser" timestamp="1590629440205">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state x="580" y="128" key="#com.intellij.ide.util.MemberChooser/0.0.1549.831@0.0.1549.831" timestamp="1590629440205" />
+    <state x="546" y="173" key="FileChooserDialogImpl" timestamp="1590368088465">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state x="546" y="173" key="FileChooserDialogImpl/0.0.1549.831@0.0.1549.831" timestamp="1590368088465" />
+    <state width="1510" height="206" key="GridCell.Tab.0.bottom" timestamp="1590328972752">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state width="1510" height="206" key="GridCell.Tab.0.bottom/0.0.1549.831@0.0.1549.831" timestamp="1590328972752" />
+    <state width="1510" height="206" key="GridCell.Tab.0.center" timestamp="1590328972752">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state width="1510" height="206" key="GridCell.Tab.0.center/0.0.1549.831@0.0.1549.831" timestamp="1590328972752" />
+    <state width="1510" height="206" key="GridCell.Tab.0.left" timestamp="1590328972752">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state width="1510" height="206" key="GridCell.Tab.0.left/0.0.1549.831@0.0.1549.831" timestamp="1590328972752" />
+    <state width="1510" height="206" key="GridCell.Tab.0.right" timestamp="1590328972752">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state width="1510" height="206" key="GridCell.Tab.0.right/0.0.1549.831@0.0.1549.831" timestamp="1590328972752" />
+    <state x="255" y="0" key="SettingsEditor" timestamp="1590311487520">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state x="255" y="0" key="SettingsEditor/0.0.1549.831@0.0.1549.831" timestamp="1590311487520" />
+    <state x="456" y="161" width="791" height="570" key="find.popup" timestamp="1590630523614">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state x="456" y="161" width="791" height="570" key="find.popup/0.0.1549.831@0.0.1549.831" timestamp="1590630523614" />
+    <state x="2" y="122" key="new project wizard" timestamp="1590310786730">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state x="2" y="122" key="new project wizard/0.0.1549.831@0.0.1549.831" timestamp="1590310786730" />
+    <state x="432" y="69" width="672" height="676" key="search.everywhere.popup" timestamp="1590631321045">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state x="432" y="69" width="672" height="676" key="search.everywhere.popup/0.0.1549.831@0.0.1549.831" timestamp="1590631321045" />
+    <state x="244" y="103" key="spring file set editor" timestamp="1590229586433">
+      <screen x="0" y="0" width="1549" height="831" />
+    </state>
+    <state x="244" y="103" key="spring file set editor/0.0.1549.831@0.0.1549.831" timestamp="1590229586433" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/mybatis-spring-boot-autoconfigure/src/main/java/com/aa/boot/mybatis/autoconfigure/MybatisAutoConfiguration.java</url>
+          <line>157</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

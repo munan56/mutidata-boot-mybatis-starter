@@ -1,0 +1,17 @@
+{
+  "hints": [],
+  "groups": [
+    {
+      "sourceType": "com.aa.boot.mybatis.autoconfigure.MybatisesProperties",
+      "name": "mine",
+      "type": "com.aa.boot.mybatis.autoconfigure.MybatisesProperties"
+    }
+  ],
+  "properties": [
+    {
+      "sourceType": "com.aa.boot.mybatis.autoconfigure.MybatisesProperties",
+      "name": "mine.configs",
+      "type": "java.util.Map<java.lang.String,com.aa.boot.mybatis.autoconfigure.MybatisProperties>"
+    }
+  ]
+}
