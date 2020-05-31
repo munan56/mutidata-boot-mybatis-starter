@@ -1,5 +1,6 @@
 package com.aa.boot.mybatis.autoconfigure;
 
+import com.google.common.collect.ImmutableMap;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
@@ -13,18 +14,17 @@ import org.mybatis.spring.mapper.MapperFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
-import org.springframework.beans.factory.support.SimpleBeanDefinitionRegistry;
+import org.springframework.beans.factory.support.*;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
@@ -32,6 +32,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -42,17 +43,16 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.lang.Nullable;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author munan
@@ -60,7 +60,7 @@ import java.util.Set;
  * @date 2020/5/23 18:22
  */
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
+
 @org.springframework.context.annotation.Configuration
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
 @EnableConfigurationProperties({MybatisesProperties.class})
@@ -103,9 +103,20 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
         datasource();
         sqlSessionFactory();
         sqlSessionTemplate();
+        manager();
         mapper();
 
     }
+
+    private void manager() {
+        pes.getConfigs().forEach((k,v)->{
+//            DataSource dataSource = this.getBean(k + "DataSource", DataSource.class);
+            PlatformTransactionManager transactionManager = new DataSourceTransactionManager();
+            registerBean(k + "TransactionManager", transactionManager.getClass(),null,ImmutableMap.of("dataSource",k + "DataSource"),null);
+        });
+
+    }
+
 
     private void mapper() {
 
@@ -130,18 +141,44 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
         Map<String, MybatisProperties> mybatis = this.pes.getConfigs();
         mybatis.forEach((k, v) -> {
             DataSource build = v.initializeDataSourceBuilder().build();
-            registerBean(k + "DataSource", build);
+
+//            registerBean(k + "DataSource", build);
+            registerBean(k+"DataSource", build.getClass(), ImmutableMap.of("jdbcUrl",v.getUrl(),"username",v.getUsername(),"password",v.getPassword()),null,null);
+//            PlatformTransactionManager transactionManager = new DataSourceTransactionManager(build);
+//            registerBean(k + "TransactionManager", transactionManager);
+//            transactionManager.
+//            BeanDefinitionRegistry beanDefinitionRegistry = AutoConfiguredMapperScannerRegistrar.sThreadLocal.get();
+//            RootBeanDefinition rootBeanDefinition = new RootBeanDefinition();
+//            rootBeanDefinition.setBeanClass(DataSourceTransactionManager.class);
+//            MutablePropertyValues mutablePropertyValues = new MutablePropertyValues();
+//            mutablePropertyValues.add("dataSource",build);
+//            rootBeanDefinition.setPropertyValues(mutablePropertyValues);
+//            beanDefinitionRegistry.registerBeanDefinition("aaa",rootBeanDefinition);
         });
     }
 
-    public void registerBean(String name, Object instance) {
-        configurableListableBeanFactory.registerSingleton(name, instance);
+//    public void registerBean(String name, Object instance) {
+//        configurableListableBeanFactory.registerSingleton(name, instance);
+//    }
+    public void registerBean(String name, Class<?> beanClass,Map<String,Object> props,Map<String,String> refs,Map<String,String> cons) {
+        BeanDefinitionRegistry registry = AutoConfiguredMapperScannerRegistrar.sThreadLocal.get();
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(beanClass);
+        if (!CollectionUtils.isEmpty(props)){
+            props.forEach(builder::addPropertyValue);
+        }
+        if (!CollectionUtils.isEmpty(refs)){
+            refs.forEach(builder::addPropertyReference);
+        }
+        if (!CollectionUtils.isEmpty(cons)){
+            cons.forEach((beanName, beanName2) -> builder.addConstructorArgReference(beanName2));
+        }
+        registry.registerBeanDefinition(name,builder.getBeanDefinition());
     }
 
-    public <T> T getBean(String beanName, Class<T> clazz) {
-
-        return configurableListableBeanFactory.getBean(beanName, clazz);
-    }
+//    public <T> T getBean(String beanName, Class<T> clazz) {
+//
+//        return configurableListableBeanFactory.getBean(beanName, clazz);
+//    }
 
 
     public void sqlSessionFactory() throws Exception {
@@ -149,41 +186,51 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
         Set<Map.Entry<String, MybatisProperties>> entries = mybatis.entrySet();
         Iterator<Map.Entry<String, MybatisProperties>> iterator = entries.iterator();
         while (iterator.hasNext()) {
+            Map<String, Object> props = new HashMap<>();
             Map.Entry<String, MybatisProperties> next = iterator.next();
             String k = next.getKey();
             MybatisProperties v = next.getValue();
             SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
-            factory.setDataSource(this.getBean(k + "DataSource", DataSource.class));
+//            factory.setDataSource(this.getBean(k + "DataSource", DataSource.class));
 //            factory.setVfs(SpringBootVFS.class);
             if (StringUtils.hasText(v.getConfigLocation())) {
                 factory.setConfigLocation(this.resourceLoader.getResource(v.getConfigLocation()));
+                props.put("configLocation",this.resourceLoader.getResource(v.getConfigLocation()));
             }
             applyConfiguration(factory, v);
             if (v.getConfigurationProperties() != null) {
                 factory.setConfigurationProperties(v.getConfigurationProperties());
+                props.put("configurationProperties",v.getConfigurationProperties());
             }
             if (!ObjectUtils.isEmpty(this.interceptors)) {
                 factory.setPlugins(this.interceptors);
+                props.put("plugins", this.interceptors);
             }
             if (this.databaseIdProvider != null) {
                 factory.setDatabaseIdProvider(this.databaseIdProvider);
+                props.put("databaseIdProvider", this.databaseIdProvider);
             }
             if (StringUtils.hasLength(v.getTypeAliasesPackage())) {
                 factory.setTypeAliasesPackage(v.getTypeAliasesPackage());
+                props.put("typeAliasesPackage", v.getTypeAliasesPackage());
             }
             if (v.getTypeAliasesSuperType() != null) {
                 factory.setTypeAliasesSuperType(v.getTypeAliasesSuperType());
+                props.put("typeAliasesSuperType", v.getTypeAliasesSuperType());
             }
             if (StringUtils.hasLength(v.getTypeHandlersPackage())) {
                 factory.setTypeHandlersPackage(v.getTypeHandlersPackage());
+                props.put("typeHandlersPackage", v.getTypeHandlersPackage());
             }
             if (!ObjectUtils.isEmpty(v.resolveMapperLocations())) {
                 factory.setMapperLocations(v.resolveMapperLocations());
+                props.put("mapperLocations", v.resolveMapperLocations());
             }
 
-            SqlSessionFactory sqlSessionFactory = factory.getObject();
-
-            registerBean(k + "SqlSessionFactory", sqlSessionFactory);
+//            SqlSessionFactory sqlSessionFactory = factory.getObject();
+//
+//            registerBean(k + "SqlSessionFactory", sqlSessionFactory);
+            registerBean(k + "SqlSessionFactory", SqlSessionFactoryBean.class, props,ImmutableMap.of("dataSource",k +"DataSource"),null);
         }
 
     }
@@ -206,14 +253,17 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
     public void sqlSessionTemplate() {
         pes.getConfigs().forEach((k, v) -> {
             SqlSessionTemplate sqlSessionTemplate;
-            SqlSessionFactory sqlSessionFactory = this.getBean(k + "SqlSessionFactory", SqlSessionFactory.class);
+//            SqlSessionFactory sqlSessionFactory = this.getBean(k + "SqlSessionFactory", SqlSessionFactory.class);
             ExecutorType executorType = v.getExecutorType();
-            if (executorType != null) {
-                sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory, executorType);
-            } else {
-                sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory);
-            }
-            registerBean(k + "SqlSessionTemplate", sqlSessionTemplate);
+//            Map<String,String> map = new HashMap<>();
+//            if (executorType != null) {
+//                sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory, executorType);
+////                map.put("1",sqlSessionFactory)
+//            } else {
+//                sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory);
+//            }
+//            registerBean(k + "SqlSessionTemplate", sqlSessionTemplate);
+            registerBean(k + "SqlSessionTemplate", SqlSessionTemplate.class,null,null,ImmutableMap.of("1",k + "SqlSessionFactory"));
         });
 
     }
@@ -295,7 +345,6 @@ public class MybatisAutoConfiguration implements InitializingBean, BeanPostProce
     @org.springframework.context.annotation.Configuration
     @Import({MybatisAutoConfiguration.AutoConfiguredMapperScannerRegistrar.class})
     @ConditionalOnMissingBean(MapperFactoryBean.class)
-    @AutoConfigureAfter(MybatisesProperties.class)
     public static class MapperScannerRegistrarNotFoundConfiguration implements InitializingBean {
 
         @Override
