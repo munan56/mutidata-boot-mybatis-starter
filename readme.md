@@ -1,3 +1,5 @@
+
+```
 mine:
   configs:
     aaa:
@@ -14,3 +16,4 @@ mine:
       type: com.zaxxer.hikari.HikariDataSource
       driverClassName: com.mysql.cj.jdbc.Driver
       mapperScanPackage: com.github.munan56.boot.web.springwebdemo.a
+```
