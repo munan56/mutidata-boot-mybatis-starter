@@ -43,6 +43,10 @@ public class MybatisesProperties implements BeanClassLoaderAware, InitializingBe
         System.out.println(this.getConfigs());
     }
 
+    public MybatisesProperties() {
+    }
 
-
+    public MybatisesProperties(Map<String, MybatisProperties> configs) {
+        this.configs = configs;
+    }
 }
