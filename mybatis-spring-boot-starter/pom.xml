@@ -32,5 +32,9 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-properties</artifactId>
+        </dependency>
     </dependencies>
 </project>

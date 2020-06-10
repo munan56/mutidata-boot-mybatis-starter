@@ -87,59 +87,7 @@ public class MybatisAutoConfiguration implements ImportBeanDefinitionRegistrar,E
         return propsMapper.readPropertiesAs(props,JavaPropsSchema.emptySchema().withPrefix(MybatisesProperties.MYBATIS_PREFIX),MybatisesProperties.class);
 
     }
-//    public static Map<String,MybatisProperties> getPropertiesStartingWith( ConfigurableEnvironment aEnv, String aKeyPrefix ) {
-//        Map<String,MybatisProperties> result = new HashMap<>();
-//        Map<String,Object> map = getAllProperties( aEnv );
-//        for (Map.Entry<String, Object> entry : map.entrySet()) {
-//            String key = entry.getKey();
-//            if ( key.startsWith( aKeyPrefix ) ) {
-//                result.put( key, JSONObject.parseObject(JSONObject.toJSONString(entry.getValue()),MybatisProperties.class));
-//            }
-//        }
-//        return result;
-//
-//    }
 
-
-    public static Map<String,Object> getAllProperties( ConfigurableEnvironment aEnv ) {
-        Map<String,Object> result = new HashMap<>();
-        aEnv.getPropertySources().forEach( ps -> addAll( result, getAllProperties( ps ) ) );
-        return result;
-
-    }
-
-
-
-    public static Map<String,Object> getAllProperties( PropertySource<?> aPropSource ) {
-
-        Map<String,Object> result = new HashMap<>();
-        if ( aPropSource instanceof CompositePropertySource) {
-            CompositePropertySource cps = (CompositePropertySource) aPropSource;
-            cps.getPropertySources().forEach( ps -> addAll( result, getAllProperties( ps ) ) );
-            return result;
-        }
-
-
-        if ( aPropSource instanceof EnumerablePropertySource<?> ) {
-            EnumerablePropertySource<?> ps = (EnumerablePropertySource<?>) aPropSource;
-            Arrays.asList( ps.getPropertyNames() ).forEach(key -> result.put( key, ps.getProperty( key ) ) );
-            return result;
-        }
-        return result;
-
-    }
-
-
-    private static void addAll( Map<String, Object> aBase, Map<String, Object> aToBeAdded ) {
-        for (Map.Entry<String, Object> entry : aToBeAdded.entrySet()) {
-            if ( aBase.containsKey( entry.getKey() ) ) {
-                continue;
-            }
-            aBase.put( entry.getKey(), entry.getValue() );
-
-        }
-
-    }
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
         try {
