@@ -1,9 +1,9 @@
 package com.aa.boot.mybatis.autoconfigure;
 
-import com.aa.boot.mybatis.autoconfigure.ConfigurationCustomizer;
-import com.aa.boot.mybatis.autoconfigure.MybatisProperties;
-import com.aa.boot.mybatis.autoconfigure.MybatisesProperties;
-import com.alibaba.fastjson.JSONObject;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
+import com.fasterxml.jackson.dataformat.javaprop.JavaPropsSchema;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
@@ -18,8 +18,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
@@ -32,7 +30,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 /**
  * @author munan
@@ -64,29 +64,43 @@ public class MybatisAutoConfiguration implements ImportBeanDefinitionRegistrar,E
 
     @Override
     public void setEnvironment(Environment environment) {
-        ConfigurableEnvironment environment1 = (ConfigurableEnvironment) environment;
-        environment1.getPropertySources();
-//        Map<String, MybatisProperties> allProperties = getPropertiesStartingWith(environment1,"mine.configs");
-        Map<String, Object> allProperties = new HashMap<>();
-        allProperties.put("1","2");
-        if (!CollectionUtils.isEmpty(allProperties)){
-            String s = "{\"configs\":{\"aaa\":{\"password\":\"admin123\",\"url\":\"jdbc:mysql://localhost:3306/user?serverTimezone=UTC\",\"testmapperScanPackage\":\"com.github.munan56.boot.web.springwebdemo.mapper\",\"type\":\"com.zaxxer.hikari.HikariDataSource\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"username\":\"root\"},\"ccc\":{\"password\":\"admin123\",\"username\":\"root\",\"testmapperScanPackage\":\"com.github.munan56.boot.web.springwebdemo.a\",\"url\":\"jdbc:mysql://localhost:3306/item?serverTimezone=UTC\",\"driverClassName\":\"com.mysql.cj.jdbc.Driver\",\"type\":\"com.zaxxer.hikari.HikariDataSource\"}}}";
-
-            pes = JSONObject.parseObject(s,MybatisesProperties.class);
+        ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
+        try {
+            MybatisesProperties properties = properties(env);
+            pes = properties;
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
-    public static Map<String,MybatisProperties> getPropertiesStartingWith( ConfigurableEnvironment aEnv, String aKeyPrefix ) {
-        Map<String,MybatisProperties> result = new HashMap<>();
-        Map<String,Object> map = getAllProperties( aEnv );
-        for (Map.Entry<String, Object> entry : map.entrySet()) {
-            String key = entry.getKey();
-            if ( key.startsWith( aKeyPrefix ) ) {
-                result.put( key, JSONObject.parseObject(JSONObject.toJSONString(entry.getValue()),MybatisProperties.class));
-            }
-        }
-        return result;
+
+    public MybatisesProperties properties(ConfigurableEnvironment env) throws IOException {
+        Properties props = new Properties();
+        MutablePropertySources propSrcs = env.getPropertySources();
+        StreamSupport.stream(propSrcs.spliterator(), false)
+                .filter(ps -> ps instanceof EnumerablePropertySource)
+                .map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())
+                .flatMap(Arrays::<String>stream)
+                .filter(name->StringUtils.startsWithIgnoreCase(name,MybatisesProperties.MYBATIS_PREFIX))
+                .forEach(propName -> props.setProperty(propName, env.getProperty(propName)));
+        JavaPropsMapper propsMapper = new JavaPropsMapper();
+
+        return propsMapper.readPropertiesAs(props,JavaPropsSchema.emptySchema().withPrefix(MybatisesProperties.MYBATIS_PREFIX),MybatisesProperties.class);
 
     }
+//    public static Map<String,MybatisProperties> getPropertiesStartingWith( ConfigurableEnvironment aEnv, String aKeyPrefix ) {
+//        Map<String,MybatisProperties> result = new HashMap<>();
+//        Map<String,Object> map = getAllProperties( aEnv );
+//        for (Map.Entry<String, Object> entry : map.entrySet()) {
+//            String key = entry.getKey();
+//            if ( key.startsWith( aKeyPrefix ) ) {
+//                result.put( key, JSONObject.parseObject(JSONObject.toJSONString(entry.getValue()),MybatisProperties.class));
+//            }
+//        }
+//        return result;
+//
+//    }
+
+
     public static Map<String,Object> getAllProperties( ConfigurableEnvironment aEnv ) {
         Map<String,Object> result = new HashMap<>();
         aEnv.getPropertySources().forEach( ps -> addAll( result, getAllProperties( ps ) ) );
@@ -204,7 +218,7 @@ public class MybatisAutoConfiguration implements ImportBeanDefinitionRegistrar,E
             }
             scanner.registerFilters();
             scanner.setSqlSessionFactoryBeanName(k + "SqlSessionFactory");
-            scanner.doScan(v.getTestmapperScanPackage());
+            scanner.doScan(v.getMapperScanPackage());
         }
 
 

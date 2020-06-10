@@ -40,17 +40,6 @@ public class MybatisProperties implements BeanClassLoaderAware, InitializingBean
      */
     private String[] mapperScanPackage;
 
-    public String getTestmapperScanPackage() {
-        return testmapperScanPackage;
-    }
-
-    public void setTestmapperScanPackage(String testmapperScanPackage) {
-        this.testmapperScanPackage = testmapperScanPackage;
-    }
-
-    private String testmapperScanPackage;
-
-
     /**
      * Location of MyBatis xml config file.
      */
