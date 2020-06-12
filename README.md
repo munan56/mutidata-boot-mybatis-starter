@@ -1,4 +1,9 @@
 # mutidata-boot-mybatis-starter
+
+a BOOT stater for mybatis with multiple datasource
+
+
+```
 mine:
   configs:
     aaa:
@@ -17,3 +22,4 @@ mine:
       driverClassName: com.mysql.cj.jdbc.Driver
       mapperScanPackage: 
       - com.github.munan56.boot.web.springwebdemo.a
+```
