@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package com.aa.boot.mybatis.autoconfigure;
+package io.github.munan56.mybatis.autoconfigure;
 
 import org.apache.ibatis.session.Configuration;
 

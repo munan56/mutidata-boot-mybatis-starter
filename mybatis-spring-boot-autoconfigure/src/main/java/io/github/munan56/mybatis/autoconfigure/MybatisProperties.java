@@ -1,4 +1,4 @@
-package com.aa.boot.mybatis.autoconfigure;
+package io.github.munan56.mybatis.autoconfigure;
 
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;

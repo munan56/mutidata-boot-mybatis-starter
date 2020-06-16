@@ -1,7 +1,6 @@
-package com.aa.boot.mybatis.autoconfigure;
+package io.github.munan56.mybatis.autoconfigure;
 
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
 import com.fasterxml.jackson.dataformat.javaprop.JavaPropsSchema;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
