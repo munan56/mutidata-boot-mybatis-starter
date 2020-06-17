@@ -1,8 +1,14 @@
 # mutidata-boot-mybatis-starter
 
 a BOOT stater for mybatis with multiple datasource
+```
+ <dependency>
+  <groupId>io.github.munan56</groupId>
+  <artifactId>mybatis-spring-boot-starter</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+</dependency>
 
-
+```
 ```
 mine:
   configs:
