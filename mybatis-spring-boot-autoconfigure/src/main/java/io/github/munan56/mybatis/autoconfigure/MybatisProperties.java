@@ -19,7 +19,6 @@ import java.util.stream.Stream;
 /**
  * @author munan
  * @version 1.0
- * @date 2020/5/25 10:22
  */
 public class MybatisProperties implements BeanClassLoaderAware, InitializingBean {
     private ClassLoader classLoader;

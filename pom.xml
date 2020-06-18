@@ -1,108 +1,153 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.sonatype.oss</groupId>
-    <artifactId>oss-parent</artifactId>
-    <version>7</version>
-  </parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
 
-  <groupId>io.github.munan56</groupId>
-  <artifactId>mutidata-boot-mybatis-parent</artifactId>
-  <version>0.0.1</version>
-  <modules>
-    <module>mybatis-spring-boot-autoconfigure</module>
-      <module>mybatis-spring-boot-starter</module>
-  </modules>
-  <packaging>pom</packaging>
+    <groupId>io.github.munan56</groupId>
+    <artifactId>mutidata-boot-mybatis-parent</artifactId>
+    <version>0.0.1</version>
+    <modules>
+        <module>mybatis-spring-boot-autoconfigure</module>
+        <module>mybatis-spring-boot-starter</module>
+    </modules>
+    <packaging>pom</packaging>
 
-  <name>mutidata-boot-mybatis-parent</name>
-  <description>Spring Boot Support for MyBatis</description>
+    <name>mutidata-boot-mybatis-parent</name>
+    <description>Spring Boot Support for MyBatis</description>
 
-  <scm>
     <url>https://github.com/munan56/mutidata-boot-mybatis-starter</url>
-    <connection>https://github.com/munan56/mutidata-boot-mybatis-starter.git</connection>
-  </scm>
 
-  <developers>
-    <developer>
-      <name>munan</name>
-      <id>munan</id>
-      <email>munan56@126.com</email>
-      <roles>
-        <role>Developer</role>
-      </roles>
-      <timezone>+8</timezone>
-    </developer>
-  </developers>
+    <scm>
+        <url>https://github.com/munan56/mutidata-boot-mybatis-starter</url>
+        <connection>https://github.com/munan56/mutidata-boot-mybatis-starter.git</connection>
+    </scm>
 
-  <properties>
-    <java.version>1.8</java.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <mybatis.version>3.5.1</mybatis.version>
-    <mybatis-spring.version>2.0.1</mybatis-spring.version>
-    <spring-boot.version>2.3.0.RELEASE</spring-boot.version>
-  </properties>
+    <developers>
+        <developer>
+            <name>munan</name>
+            <id>munan</id>
+            <email>munan56@126.com</email>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+8</timezone>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>A business-friendly OSS license</comments>
+        </license>
+    </licenses>
+    <properties>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <mybatis.version>3.5.1</mybatis.version>
+        <mybatis-spring.version>2.0.1</mybatis-spring.version>
+        <spring-boot.version>2.3.0.RELEASE</spring-boot.version>
+    </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.mybatis</groupId>
-        <artifactId>mybatis</artifactId>
-        <version>${mybatis.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mybatis</groupId>
-        <artifactId>mybatis-spring</artifactId>
-        <version>${mybatis-spring.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-dependencies</artifactId>
-        <version>${spring-boot.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>io.github.munan56</groupId>
-        <artifactId>mybatis-spring-boot-autoconfigure</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.github.munan56</groupId>
-        <artifactId>mybatis-spring-boot-starter</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  <distributionManagement>
-    <snapshotRepository>
-      <id>sonatype-nexus-snapshots</id>
-      <name>Sonatype Nexus Snapshots</name>
-      <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-    </snapshotRepository>
-    <repository>
-      <id>sonatype-nexus-staging</id>
-      <name>Nexus Release Repository</name>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>${mybatis-spring.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.munan56</groupId>
+                <artifactId>mybatis-spring-boot-autoconfigure</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.munan56</groupId>
+                <artifactId>mybatis-spring-boot-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.jacoco</groupId>
-          <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.2</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
-
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

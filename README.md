@@ -5,7 +5,7 @@ a BOOT stater for mybatis with multiple datasource
  <dependency>
   <groupId>io.github.munan56</groupId>
   <artifactId>mybatis-spring-boot-starter</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
 </dependency>
 
 ```

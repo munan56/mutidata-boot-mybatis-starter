@@ -9,7 +9,6 @@ import java.util.Map;
 /**
  * @author munan
  * @version 1.0
- * @date 2020/5/23 18:23
  */
 
 @ConfigurationProperties(prefix = MybatisesProperties.MYBATIS_PREFIX)

@@ -36,7 +36,6 @@ import java.util.stream.StreamSupport;
 /**
  * @author munan
  * @version 1.0
- * @date 2020/6/8 17:10
  */
 @org.springframework.context.annotation.Configuration
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
