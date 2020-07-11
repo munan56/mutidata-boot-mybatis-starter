@@ -1,0 +1,22 @@
+mine:
+  configs:
+    test1:
+      url: jdbc:mysql://localhost:3306/test1?serverTimezone=UTC
+      username: root
+      password: admin123
+      type: com.zaxxer.hikari.HikariDataSource
+      driverClassName: com.mysql.cj.jdbc.Driver
+      mapperScanPackage:
+        - io.github.munan56.mybatis.sample.test1.mapper
+      mapperLocations:
+        - 'classpath:mapper/*Test1Mapper.xml'
+    test2:
+      url: jdbc:mysql://localhost:3306/test2?serverTimezone=UTC
+      username: root
+      password: admin123
+      type: com.zaxxer.hikari.HikariDataSource
+      driverClassName: com.mysql.cj.jdbc.Driver
+      mapperScanPackage:
+        - io.github.munan56.mybatis.sample.test2.mapper
+      mapperLocations:
+        - 'classpath:mapper/*Test2Mapper.xml'
