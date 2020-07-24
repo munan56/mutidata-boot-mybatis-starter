@@ -38,7 +38,7 @@ public class Service {
         System.out.println(insert);
 
     }
-    @Transactional(rollbackFor = Exception.class,transactionManager = "test2TransactionManager")
+    @Transactional(rollbackFor = Exception.class)
     public void test2(){
         Account account = new Account();
         account.setName("11111111");

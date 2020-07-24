@@ -2,8 +2,7 @@ package io.github.munan56.mybatis.autoconfigure;
 
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.InitializingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.core.io.Resource;
@@ -16,14 +15,16 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Stream;
 
+import static io.github.munan56.mybatis.autoconfigure.MybatisProperties.MYBATIS_PREFIX;
+
 /**
  * @author munan
  * @version 1.0
  */
-public class MybatisProperties implements BeanClassLoaderAware, InitializingBean {
-    private ClassLoader classLoader;
+@ConfigurationProperties(prefix = MYBATIS_PREFIX)
+public class MybatisProperties {
     private static final ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
-//    private EmbeddedDatabaseConnection embeddedDatabaseConnection = EmbeddedDatabaseConnection.NONE;
+    public static final String MYBATIS_PREFIX = "mybatis";
 
     private String url;
 
@@ -124,11 +125,11 @@ public class MybatisProperties implements BeanClassLoaderAware, InitializingBean
         this.driverClassName = driverClassName;
     }
 
-    public Class<? extends DataSource>  getType() {
+    public Class<? extends DataSource> getType() {
         return type;
     }
 
-    public void setType(Class<? extends DataSource>  type) {
+    public void setType(Class<? extends DataSource> type) {
         this.type = type;
     }
 
@@ -212,22 +213,13 @@ public class MybatisProperties implements BeanClassLoaderAware, InitializingBean
         this.configuration = configuration;
     }
 
-    @Override
-    public void setBeanClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
-    }
-
-    @Override
-    public void afterPropertiesSet(){
-        System.out.println(this.toString());
-    }
 
     public DataSourceBuilder<?> initializeDataSourceBuilder() {
 
-    return DataSourceBuilder.create().type(getType())
-            .driverClassName(getDriverClassName()).url(getUrl())
-            .username(getUsername()).password(getPassword());
-  }
+        return DataSourceBuilder.create().type(getType())
+                .driverClassName(getDriverClassName()).url(getUrl())
+                .username(getUsername()).password(getPassword());
+    }
 
     public Resource[] resolveMapperLocations() {
         return Stream.of(Optional.ofNullable(this.mapperLocations).orElse(new String[0]))

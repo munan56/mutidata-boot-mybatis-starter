@@ -26,7 +26,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.munan.boot.test.pagehelper.o.github.munan56.mybatis.sample.mapper.UserMapper">
+<mapper namespace="io.github.munan56.mybatis.sample.test1.mapper.UserMapper">
     <insert id="insert">
         insert  into user (`name`)values (#{name})
     </insert>

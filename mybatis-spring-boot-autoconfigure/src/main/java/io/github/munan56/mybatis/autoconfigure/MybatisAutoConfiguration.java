@@ -1,8 +1,6 @@
 package io.github.munan56.mybatis.autoconfigure;
 
 
-import com.fasterxml.jackson.dataformat.javaprop.JavaPropsMapper;
-import com.fasterxml.jackson.dataformat.javaprop.JavaPropsSchema;
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
@@ -17,10 +15,13 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.bind.BindResult;
+import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
-import org.springframework.core.env.*;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -29,9 +30,9 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.StreamSupport;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author munan
@@ -39,136 +40,145 @@ import java.util.stream.StreamSupport;
  */
 @org.springframework.context.annotation.Configuration
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
-@EnableConfigurationProperties({MybatisesProperties.class})
-public class MybatisAutoConfiguration implements ImportBeanDefinitionRegistrar,EnvironmentAware, InitializingBean {
+@EnableConfigurationProperties({MybatisesProperties.class, MybatisProperties.class})
+public class MybatisAutoConfiguration implements ImportBeanDefinitionRegistrar, EnvironmentAware, InitializingBean {
     private static final Logger logger = LoggerFactory.getLogger(MybatisAutoConfiguration.class);
 
 
-    private  MybatisesProperties pes;
+    private static final String DATASOURCE = "DataSource";
 
-    private  Interceptor[] interceptors;
+    private static final String SQLSESSIONFACTORY = "SqlSessionFactory";
 
-    private  ResourceLoader resourceLoader;
+    private static final String SQLSESSIONTEMPLETE = "SqlSessionTemplete";
 
-    private  DatabaseIdProvider databaseIdProvider;
+    private static final String TRANSACTIONMANAGER = "TransactionManager";
 
-    private  List<ConfigurationCustomizer> configurationCustomizers;
+
+    private MybatisesProperties multipleMybatisProperties;
+
+    private MybatisProperties mybatisProperties;
+
+    private Environment environment;
+    //
+    private Interceptor[] interceptors;
+
+    private ResourceLoader resourceLoader;
+
+    private DatabaseIdProvider databaseIdProvider;
+
+    private List<ConfigurationCustomizer> configurationCustomizers;
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        logger.info("start mine");
-
+        if (Objects.nonNull(this.mybatisProperties) && Objects.isNull(this.multipleMybatisProperties)) {
+            logger.info("Register Single DataSource with Mybatis Successfully");
+        }
+        if (Objects.nonNull(this.multipleMybatisProperties) && Objects.isNull(this.mybatisProperties)) {
+            logger.info("Register Single DataSource with Mybatis Successfully");
+        }
+        if (Objects.isNull(this.mybatisProperties) && Objects.isNull(this.multipleMybatisProperties)) {
+//            logger.error("Could not found Mybatis configuration with prefix {} or {} Check your replica set configuration!", MybatisProperties.MYBATIS_PREFIX, MybatisProperties.MYBATIS_PREFIX);
+        }
     }
 
     @Override
     public void setEnvironment(Environment environment) {
-        ConfigurableEnvironment env = (ConfigurableEnvironment) environment;
-        try {
-            MybatisesProperties properties = properties(env);
-            pes = properties;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public MybatisesProperties properties(ConfigurableEnvironment env) throws IOException {
-        Properties props = new Properties();
-        MutablePropertySources propSrcs = env.getPropertySources();
-        StreamSupport.stream(propSrcs.spliterator(), false)
-                .filter(ps -> ps instanceof EnumerablePropertySource)
-                .map(ps -> ((EnumerablePropertySource) ps).getPropertyNames())
-                .flatMap(Arrays::<String>stream)
-                .filter(name->StringUtils.startsWithIgnoreCase(name,MybatisesProperties.MYBATIS_PREFIX))
-                .forEach(propName -> props.setProperty(propName, env.getProperty(propName)));
-        JavaPropsMapper propsMapper = new JavaPropsMapper();
-
-        return propsMapper.readPropertiesAs(props,JavaPropsSchema.emptySchema().withPrefix(MybatisesProperties.MYBATIS_PREFIX),MybatisesProperties.class);
-
+        this.environment = environment;
     }
 
     @Override
     public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
+        ConfigurationProperties multiple = MybatisesProperties.class.getAnnotation(ConfigurationProperties.class);
+        ConfigurationProperties mybatis = MybatisProperties.class.getAnnotation(ConfigurationProperties.class);
+        BindResult<MybatisesProperties> multipleBind = Binder.get(this.environment).bind(multiple.prefix(), MybatisesProperties.class);
+        this.multipleMybatisProperties = multipleBind.isBound() ? multipleBind.get() : null;
+        BindResult<MybatisProperties> mybatisBind = Binder.get(this.environment).bind(mybatis.prefix(), MybatisProperties.class);
+        this.mybatisProperties = mybatisBind.isBound() ? mybatisBind.get() : null;
         try {
-            datasource(registry);
+            registerMissBeanDefinitions(registry);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new IllegalStateException(e);
         }
     }
 
-    public void datasource(BeanDefinitionRegistry registry) throws Exception {
-        Map<String, MybatisProperties> mybatis = this.pes.getConfigs();
-        Iterator<Map.Entry<String, MybatisProperties>> iterator = mybatis.entrySet().iterator();
-        while (iterator.hasNext()){
-            Map.Entry<String, MybatisProperties> next = iterator.next();
-            String k = next.getKey();
-            MybatisProperties v = next.getValue();
+    public void registerMissBeanDefinitions(BeanDefinitionRegistry registry) throws Exception {
 
-            DataSource build = v.initializeDataSourceBuilder().build();
-            BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(DataSource.class, () -> build);
-            registry.registerBeanDefinition(k+"DataSource",builder.getBeanDefinition());
-
-
-            SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
-            factory.setDataSource(build);
-//            factory.setVfs(SpringBootVFS.class);
-            if (StringUtils.hasText(v.getConfigLocation())) {
-                factory.setConfigLocation(this.resourceLoader.getResource(v.getConfigLocation()));
+        if (Objects.nonNull(this.multipleMybatisProperties)) {
+            boolean primary = true;
+            for (Map.Entry<String, MybatisProperties> entry : multipleMybatisProperties.getMybatis().entrySet()) {
+                registryMybatis(entry.getKey(), primary, entry.getValue(), registry);
+                primary = false;
             }
-            applyConfiguration(factory, v);
-            if (v.getConfigurationProperties() != null) {
-                factory.setConfigurationProperties(v.getConfigurationProperties());
-            }
-            if (!ObjectUtils.isEmpty(this.interceptors)) {
-                factory.setPlugins(this.interceptors);
-            }
-            if (this.databaseIdProvider != null) {
-                factory.setDatabaseIdProvider(this.databaseIdProvider);
-            }
-            if (StringUtils.hasLength(v.getTypeAliasesPackage())) {
-                factory.setTypeAliasesPackage(v.getTypeAliasesPackage());
-            }
-            if (v.getTypeAliasesSuperType() != null) {
-                factory.setTypeAliasesSuperType(v.getTypeAliasesSuperType());
-            }
-            if (StringUtils.hasLength(v.getTypeHandlersPackage())) {
-                factory.setTypeHandlersPackage(v.getTypeHandlersPackage());
-            }
-            if (!ObjectUtils.isEmpty(v.resolveMapperLocations())) {
-                factory.setMapperLocations(v.resolveMapperLocations());
-            }
-
-            SqlSessionFactory   sqlSessionFactory = factory.getObject();
-                BeanDefinitionBuilder sqlSessionFactoryBuilder = BeanDefinitionBuilder.genericBeanDefinition(SqlSessionFactory.class, () -> sqlSessionFactory);
-                registry.registerBeanDefinition(k+"SqlSessionFactory",sqlSessionFactoryBuilder.getBeanDefinition());
+        }
+        if (Objects.nonNull(this.mybatisProperties)) {
+            registryMybatis(null, true, this.mybatisProperties, registry);
+        }
+    }
 
 
+    private void registryMybatis(String prefix, boolean primary, MybatisProperties properties, BeanDefinitionRegistry registry) throws Exception {
 
-            SqlSessionTemplate sqlSessionTemplate;
-            ExecutorType executorType = v.getExecutorType();
-            if (executorType != null) {
-                sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory, executorType);
-            } else {
-                sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory);
-            }
-            BeanDefinitionBuilder sqlSessionTemplateBuilder = BeanDefinitionBuilder.genericBeanDefinition(SqlSessionTemplate.class, () -> sqlSessionTemplate);
+        DataSource build = properties.initializeDataSourceBuilder().build();
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(DataSource.class, () -> build);
+        builder.setPrimary(primary);
+        registry.registerBeanDefinition(prefix + DATASOURCE, builder.getBeanDefinition());
 
-            registry.registerBeanDefinition(k+"SqlSessionTemplate", sqlSessionTemplateBuilder.getBeanDefinition());
-
-            DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(build);
-            BeanDefinitionBuilder transactionManagerBuilder = BeanDefinitionBuilder.genericBeanDefinition(DataSourceTransactionManager.class, () -> transactionManager);
-            registry.registerBeanDefinition(k + "TransactionManager", transactionManagerBuilder.getBeanDefinition());
-            ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
-
-            if (this.resourceLoader != null) {
-                scanner.setResourceLoader(this.resourceLoader);
-            }
-            scanner.registerFilters();
-            scanner.setSqlSessionFactoryBeanName(k + "SqlSessionFactory");
-            scanner.doScan(v.getMapperScanPackage());
+        SqlSessionFactoryBean factory = new SqlSessionFactoryBean();
+        factory.setDataSource(build);
+        if (StringUtils.hasText(properties.getConfigLocation())) {
+            factory.setConfigLocation(this.resourceLoader.getResource(properties.getConfigLocation()));
+        }
+        applyConfiguration(factory, properties);
+        if (properties.getConfigurationProperties() != null) {
+            factory.setConfigurationProperties(properties.getConfigurationProperties());
+        }
+        if (!ObjectUtils.isEmpty(this.interceptors)) {
+            factory.setPlugins(this.interceptors);
+        }
+        if (this.databaseIdProvider != null) {
+            factory.setDatabaseIdProvider(this.databaseIdProvider);
+        }
+        if (StringUtils.hasLength(properties.getTypeAliasesPackage())) {
+            factory.setTypeAliasesPackage(properties.getTypeAliasesPackage());
+        }
+        if (properties.getTypeAliasesSuperType() != null) {
+            factory.setTypeAliasesSuperType(properties.getTypeAliasesSuperType());
+        }
+        if (StringUtils.hasLength(properties.getTypeHandlersPackage())) {
+            factory.setTypeHandlersPackage(properties.getTypeHandlersPackage());
+        }
+        if (!ObjectUtils.isEmpty(properties.resolveMapperLocations())) {
+            factory.setMapperLocations(properties.resolveMapperLocations());
         }
 
+        SqlSessionFactory sqlSessionFactory = factory.getObject();
+        BeanDefinitionBuilder sqlSessionFactoryBuilder = BeanDefinitionBuilder.genericBeanDefinition(SqlSessionFactory.class, () -> sqlSessionFactory);
+        registry.registerBeanDefinition(prefix + SQLSESSIONFACTORY, sqlSessionFactoryBuilder.getBeanDefinition());
 
-}
+
+        SqlSessionTemplate sqlSessionTemplate;
+        ExecutorType executorType = properties.getExecutorType();
+        if (executorType != null) {
+            sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory, executorType);
+        } else {
+            sqlSessionTemplate = new SqlSessionTemplate(sqlSessionFactory);
+        }
+        BeanDefinitionBuilder sqlSessionTemplateBuilder = BeanDefinitionBuilder.genericBeanDefinition(SqlSessionTemplate.class, () -> sqlSessionTemplate);
+
+        registry.registerBeanDefinition(prefix + SQLSESSIONTEMPLETE, sqlSessionTemplateBuilder.getBeanDefinition());
+
+        DataSourceTransactionManager transactionManager = new DataSourceTransactionManager(build);
+        BeanDefinitionBuilder transactionManagerBuilder = BeanDefinitionBuilder.genericBeanDefinition(DataSourceTransactionManager.class, () -> transactionManager);
+        registry.registerBeanDefinition(prefix + TRANSACTIONMANAGER, transactionManagerBuilder.getBeanDefinition());
+        ClassPathMapperScanner scanner = new ClassPathMapperScanner(registry);
+
+        if (this.resourceLoader != null) {
+            scanner.setResourceLoader(this.resourceLoader);
+        }
+        scanner.registerFilters();
+        scanner.setSqlSessionFactoryBeanName(prefix + SQLSESSIONFACTORY);
+        scanner.doScan(properties.getMapperScanPackage());
+    }
 
 
     private void applyConfiguration(SqlSessionFactoryBean factory, MybatisProperties properties) {

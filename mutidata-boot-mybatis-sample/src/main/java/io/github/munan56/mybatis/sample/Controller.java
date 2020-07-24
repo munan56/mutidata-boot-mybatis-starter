@@ -6,10 +6,13 @@ import io.github.munan56.mybatis.sample.test2.mapper.AccountMapper;
 import io.github.munan56.mybatis.sample.test1.mapper.UserMapper;
 import io.github.munan56.mybatis.sample.mode.Account;
 import io.github.munan56.mybatis.sample.mode.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import sun.jvm.hotspot.HelloWorld;
 
 import java.util.List;
 
@@ -20,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class Controller {
-
+    Logger logger = LoggerFactory.getLogger(Controller.class);
     @Autowired
     private UserMapper userMapper;
 
@@ -43,6 +46,7 @@ public class Controller {
     @RequestMapping("/account")
     public Page<Account> accounts(){
         PageHelper.startPage(1,1);
+        logger.info("1111");
         return  accountMapper.list();
     }
     @RequestMapping("/insert/user")

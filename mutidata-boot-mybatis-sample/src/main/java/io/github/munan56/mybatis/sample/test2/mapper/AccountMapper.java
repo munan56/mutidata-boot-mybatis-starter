@@ -2,6 +2,7 @@ package io.github.munan56.mybatis.sample.test2.mapper;
 
 import com.github.pagehelper.Page;
 import io.github.munan56.mybatis.sample.mode.Account;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * @Author: munan
