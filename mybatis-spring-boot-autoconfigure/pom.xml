@@ -67,12 +67,6 @@
             <artifactId>commons-dbcp2</artifactId>
             <optional>true</optional>
         </dependency>
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.data</groupId>-->
-<!--            <artifactId>spring-data-commons</artifactId>-->
-<!--        </dependency>-->
-
 
     </dependencies>
 
