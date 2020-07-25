@@ -1,5 +1,6 @@
 package io.github.munan56.mybatis.autoconfigure;
 
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ExecutorType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -125,7 +126,7 @@ public class MybatisProperties {
         this.driverClassName = driverClassName;
     }
 
-    public Class<? extends DataSource> getType() {
+    public Class<? extends DataSource> getType(){
         return type;
     }
 
@@ -215,10 +216,16 @@ public class MybatisProperties {
 
 
     public DataSourceBuilder<?> initializeDataSourceBuilder() {
+        if (getType() == null){
+            return DataSourceBuilder.create().type(HikariDataSource.class)
+                    .driverClassName(getDriverClassName()).url(getUrl())
+                    .username(getUsername()).password(getPassword());
+        }else {
+            return DataSourceBuilder.create().type(getType())
+                    .driverClassName(getDriverClassName()).url(getUrl())
+                    .username(getUsername()).password(getPassword());
+        }
 
-        return DataSourceBuilder.create().type(getType())
-                .driverClassName(getDriverClassName()).url(getUrl())
-                .username(getUsername()).password(getPassword());
     }
 
     public Resource[] resolveMapperLocations() {

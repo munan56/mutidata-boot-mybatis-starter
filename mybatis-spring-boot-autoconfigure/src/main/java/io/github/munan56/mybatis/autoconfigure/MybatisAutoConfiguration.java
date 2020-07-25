@@ -41,7 +41,7 @@ import java.util.Objects;
 @org.springframework.context.annotation.Configuration
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
 @EnableConfigurationProperties({MybatisesProperties.class, MybatisProperties.class})
-public class MybatisAutoConfiguration implements ImportBeanDefinitionRegistrar, EnvironmentAware, InitializingBean {
+public class MybatisAutoConfiguration implements ImportBeanDefinitionRegistrar, EnvironmentAware {
     private static final Logger logger = LoggerFactory.getLogger(MybatisAutoConfiguration.class);
 
 
@@ -68,18 +68,6 @@ public class MybatisAutoConfiguration implements ImportBeanDefinitionRegistrar, 
 
     private List<ConfigurationCustomizer> configurationCustomizers;
 
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        if (Objects.nonNull(this.mybatisProperties) && Objects.isNull(this.multipleMybatisProperties)) {
-            logger.info("Register Single DataSource with Mybatis Successfully");
-        }
-        if (Objects.nonNull(this.multipleMybatisProperties) && Objects.isNull(this.mybatisProperties)) {
-            logger.info("Register Single DataSource with Mybatis Successfully");
-        }
-        if (Objects.isNull(this.mybatisProperties) && Objects.isNull(this.multipleMybatisProperties)) {
-//            logger.error("Could not found Mybatis configuration with prefix {} or {} Check your replica set configuration!", MybatisProperties.MYBATIS_PREFIX, MybatisProperties.MYBATIS_PREFIX);
-        }
-    }
 
     @Override
     public void setEnvironment(Environment environment) {
@@ -94,6 +82,16 @@ public class MybatisAutoConfiguration implements ImportBeanDefinitionRegistrar, 
         this.multipleMybatisProperties = multipleBind.isBound() ? multipleBind.get() : null;
         BindResult<MybatisProperties> mybatisBind = Binder.get(this.environment).bind(mybatis.prefix(), MybatisProperties.class);
         this.mybatisProperties = mybatisBind.isBound() ? mybatisBind.get() : null;
+        if (Objects.nonNull(this.mybatisProperties) && Objects.isNull(this.multipleMybatisProperties)) {
+            logger.info("Register Single DataSource with Mybatis ");
+        }
+        if (Objects.nonNull(this.multipleMybatisProperties) && Objects.isNull(this.mybatisProperties)) {
+            logger.info("Register multiple DataSource with Mybatis ");
+        }
+        if (Objects.isNull(this.mybatisProperties) && Objects.isNull(this.multipleMybatisProperties)) {
+            logger.error("Could not found Mybatis configuration with prefix {} or {} Check your replica set configuration!", MybatisProperties.MYBATIS_PREFIX, MybatisProperties.MYBATIS_PREFIX);
+            return;
+        }
         try {
             registerMissBeanDefinitions(registry);
         } catch (Exception e) {

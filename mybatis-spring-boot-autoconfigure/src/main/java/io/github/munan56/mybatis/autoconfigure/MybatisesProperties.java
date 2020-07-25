@@ -1,7 +1,10 @@
 package io.github.munan56.mybatis.autoconfigure;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 
 /**
@@ -11,6 +14,7 @@ import java.util.Map;
 
 @ConfigurationProperties(prefix = MybatisesProperties.MYBATIS_PREFIX)
 public class MybatisesProperties {
+    private static final Logger logger = LoggerFactory.getLogger(MybatisesProperties.class);
     public static final String MYBATIS_PREFIX = "multiple";
 
     private Map<String, MybatisProperties> mybatis;
