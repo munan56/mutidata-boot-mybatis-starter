@@ -10,8 +10,8 @@ a BOOT stater for mybatis with multiple datasource
 
 ```
 ```
-mine:
-  configs:
+multiple:
+  mybatis:
     aaa:
       url: jdbc:mysql://localhost:3306/user?serverTimezone=UTC
       username: root
