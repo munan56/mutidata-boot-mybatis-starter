@@ -96,7 +96,6 @@
     </distributionManagement>
 
     <build>
-
         <pluginManagement>
             <plugins>
                 <plugin>
